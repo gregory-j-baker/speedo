@@ -1,100 +1,65 @@
-import { Routes, Route, Outlet, Link } from "react-router-dom";
+import { useState, useMemo } from "react";
+import "./index.css";
 
-export default function App() {
+function App() {
+  const [speed, setSpeed] = useState<number | "">("");
+  const [time, setTime] = useState<number | "">("");
+  const [newSpeed, setNewSpeed] = useState<number | "">("");
+
+  const distance = useMemo(() => {
+    if (typeof speed === "number" && typeof time === "number") {
+      return (speed * time) / 60;
+    }
+    return 0;
+  }, [speed, time]);
+
+  const newTime = useMemo(() => {
+    if (typeof newSpeed === "number" && newSpeed > 0 && distance > 0) {
+      return (distance / newSpeed) * 60;
+    }
+    return 0;
+  }, [newSpeed, distance]);
+
   return (
-    <div>
-      <h1>Basic Example</h1>
-
-      <p>
-        This example demonstrates some of the core features of React Router
-        including nested <code>&lt;Route&gt;</code>s,{" "}
-        <code>&lt;Outlet&gt;</code>s, <code>&lt;Link&gt;</code>s, and using a
-        "*" route (aka "splat route") to render a "not found" page when someone
-        visits an unrecognized URL.
-      </p>
-
-      {/* Routes nest inside one another. Nested route paths build upon
-            parent route paths, and nested route elements render inside
-            parent route elements. See the note about <Outlet> below. */}
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="about" element={<About />} />
-          <Route path="dashboard" element={<Dashboard />} />
-
-          {/* Using path="*"" means "match anything", so this route
-                acts like a catch-all for URLs that we don't have explicit
-                routes for. */}
-          <Route path="*" element={<NoMatch />} />
-        </Route>
-      </Routes>
+    <div className="container">
+      <h1>Speed Calculator</h1>
+      <div className="card">
+        <div className="input-group">
+          <label>Current Speed (km/h)</label>
+          <input
+            type="number"
+            value={speed}
+            onChange={(e) => setSpeed(e.target.value === "" ? "" : parseFloat(e.target.value))}
+            placeholder="e.g., 80"
+          />
+        </div>
+        <div className="input-group">
+          <label>Travel Time (minutes)</label>
+          <input
+            type="number"
+            value={time}
+            onChange={(e) => setTime(e.target.value === "" ? "" : parseFloat(e.target.value))}
+            placeholder="e.g., 60"
+          />
+        </div>
+        <div className="input-group">
+          <label>New Speed (km/h)</label>
+          <input
+            type="number"
+            value={newSpeed}
+            onChange={(e) => setNewSpeed(e.target.value === "" ? "" : parseFloat(e.target.value))}
+            placeholder="e.g., 100"
+          />
+        </div>
+        {newTime > 0 && (
+          <div className="result">
+            <h2>Updated Travel Time</h2>
+            <p>{newTime.toFixed(2)} minutes</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function Layout() {
-  return (
-    <div>
-      {/* A "layout route" is a good place to put markup you want to
-          share across all the pages on your site, like navigation. */}
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-          <li>
-            <Link to="/dashboard">Dashboard</Link>
-          </li>
-          <li>
-            <Link to="/nothing-here">Nothing Here</Link>
-          </li>
-        </ul>
-      </nav>
-
-      <hr />
-
-      {/* An <Outlet> renders whatever child route is currently active,
-          so you can think about this <Outlet> as a placeholder for
-          the child routes we defined above. */}
-      <Outlet />
-    </div>
-  );
-}
-
-function Home() {
-  return (
-    <div>
-      <h2>Home</h2>
-    </div>
-  );
-}
-
-function About() {
-  return (
-    <div>
-      <h2>About</h2>
-    </div>
-  );
-}
-
-function Dashboard() {
-  return (
-    <div>
-      <h2>Dashboard</h2>
-    </div>
-  );
-}
-
-function NoMatch() {
-  return (
-    <div>
-      <h2>Nothing to see here!</h2>
-      <p>
-        <Link to="/">Go to the home page</Link>
-      </p>
-    </div>
-  );
-}
+export default App;
